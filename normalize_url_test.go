@@ -13,7 +13,16 @@ func TestNormalizeURL(t *testing.T) {
 			inputURL: "https://blog.boot.dev/path",
 			expected: "blog.boot.dev/path",
 		},
-		// add more test cases here
+		{
+			name:     "remove scheme and trailing slash",
+			inputURL: "https://blog.boot.dev/path/",
+			expected: "blog.boot.dev/path",
+		},
+		{
+			name:     "remove multiple paths",
+			inputURL: "https://blog.boot.dev/path/mycate/cute/",
+			expected: "blog.boot.dev/path/mycate/cute",
+		},
 	}
 
 	for i, tc := range tests {
