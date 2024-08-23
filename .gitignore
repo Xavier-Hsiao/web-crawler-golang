@@ -8,6 +8,8 @@
 *.so
 *.dylib
 
+web-crawler-golang
+
 # Test binary, built with `go test -c`
 *.test
 
