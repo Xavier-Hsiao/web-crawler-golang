@@ -15,9 +15,15 @@ func main() {
 		fmt.Println("no website provided")
 		os.Exit(1)
 	case 1:
-		fmt.Printf("starting crawl of: %s", args[0])
+		fmt.Printf("starting crawl of: %s\n", args[0])
 	default:
 		fmt.Println("too many arguments provided")
 		os.Exit(1)
 	}
+	fmt.Println(args[0])
+	websiteHTML, err := getHTML(args[0])
+	if err != nil {
+		fmt.Errorf("failed to get webiste html")
+	}
+	fmt.Printf("result: %v\n", websiteHTML)
 }
