@@ -7,8 +7,8 @@ import (
 	"strings"
 )
 
-func getHTML(rawHTML string) (string, error) {
-	res, err := http.Get(rawHTML)
+func getHTML(rawURL string) (string, error) {
+	res, err := http.Get(rawURL)
 	if err != nil {
 		return "", fmt.Errorf("network error: %v", err)
 	}

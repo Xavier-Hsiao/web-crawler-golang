@@ -13,17 +13,21 @@ func main() {
 	switch len(args) {
 	case 0:
 		fmt.Println("no website provided")
-		os.Exit(1)
+		return
 	case 1:
-		fmt.Printf("starting crawl of: %s\n", args[0])
+		fmt.Printf("start crawling of: %s\n", args[0])
 	default:
 		fmt.Println("too many arguments provided")
-		os.Exit(1)
+		return
 	}
-	fmt.Println(args[0])
-	websiteHTML, err := getHTML(args[0])
-	if err != nil {
-		fmt.Errorf("failed to get webiste html")
+
+	pages := make(map[string]int)
+
+	crawlPage(args[0], args[0], pages)
+
+	for url, count := range pages {
+		fmt.Printf("%v - %v time(s)\n", url, count)
 	}
-	fmt.Printf("result: %v\n", websiteHTML)
+
+	fmt.Println("crawling ends")
 }
