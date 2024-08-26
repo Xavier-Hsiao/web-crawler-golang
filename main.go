@@ -21,11 +21,18 @@ func main() {
 		return
 	}
 
-	pages := make(map[string]int)
+	const maxConcurrency = 2
 
-	crawlPage(args[0], args[0], pages)
+	cfg, err := createConfig(args[0], 2)
+	if err != nil {
+		fmt.Printf("failed to create config struct:\n %v", err)
+	}
 
-	for url, count := range pages {
+	cfg.wg.Add(1)
+	go cfg.crawlPage(args[0])
+	cfg.wg.Wait()
+
+	for url, count := range cfg.pages {
 		fmt.Printf("%v - %v time(s)\n", url, count)
 	}
 

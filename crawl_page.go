@@ -5,14 +5,7 @@ import (
 	"net/url"
 )
 
-func crawlPage(rawBaseURL, rawCurrentURL string, pages map[string]int) {
-	// base URL is the root URL we're crawling
-	baseURL, err := url.Parse(rawBaseURL)
-	if err != nil {
-		fmt.Printf("Error parsing base URL")
-		return
-	}
-
+func (cfg *config) crawlPage(rawCurrentURL string) {
 	// the current URL we're crawling
 	currentURL, err := url.Parse(rawCurrentURL)
 	if err != nil {
@@ -22,7 +15,7 @@ func crawlPage(rawBaseURL, rawCurrentURL string, pages map[string]int) {
 
 	// Check if `rawCurrentUR` is on the same domain of `rawBaseURL`
 	// If not, return the current `pages`
-	if baseURL.Hostname() != currentURL.Hostname() {
+	if cfg.baseURL.Hostname() != currentURL.Hostname() {
 		return
 	}
 
@@ -34,13 +27,13 @@ func crawlPage(rawBaseURL, rawCurrentURL string, pages map[string]int) {
 
 	// Check if the current URL has been visited
 	// If so, increment 1
-	if count, exists := pages[normalizedCurrent]; exists {
-		pages[normalizedCurrent] = count + 1
+	if count, exists := cfg.pages[normalizedCurrent]; exists {
+		cfg.pages[normalizedCurrent] = count + 1
 		return
 	}
 
 	// If not, create a new entry
-	pages[normalizedCurrent] = 1
+	cfg.pages[normalizedCurrent] = 1
 
 	fmt.Printf("crawling: %s\n", rawCurrentURL)
 
