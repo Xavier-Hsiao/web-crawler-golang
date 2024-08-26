@@ -28,3 +28,19 @@ func createConfig(rawBaseURL string, maxConcurrency int) (*config, error) {
 		concurrencyControl: make(chan struct{}, maxConcurrency),
 	}, nil
 }
+
+func (cfg *config) addPageVisit(normalizedURL string) (isFirst bool) {
+	cfg.mu.Lock()
+	defer cfg.mu.Unlock()
+
+	// Check if the current URL has been visited
+	// If so, increment 1
+	if count, visited := cfg.pages[normalizedURL]; visited {
+		cfg.pages[normalizedURL] = count + 1
+		return false
+	}
+
+	// If not, create a new entry
+	cfg.pages[normalizedURL] = 1
+	return true
+}

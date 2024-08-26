@@ -1,6 +1,7 @@
 package main
 
 import (
+	"net/url"
 	"reflect"
 	"strings"
 	"testing"
@@ -60,21 +61,6 @@ func TestGetURLFromHTML(t *testing.T) {
 			expected: []string{"https://cpbl.com.tw/path/one", "https://other.com/path/one"},
 		},
 		{
-			name:     "invalid input",
-			inputURL: `\\:invalidInput`,
-			inputBody: `
-			<html>
-				<body>
-					<a href="/path/one">
-						<span>CPBL</span>
-					</a>
-				</body>
-			</html>
-			`,
-			expected:    nil,
-			errContains: "invalid base URL",
-		},
-		{
 			name:     "no href",
 			inputURL: `https://cpbl.com.tw`,
 			inputBody: `
@@ -104,7 +90,12 @@ func TestGetURLFromHTML(t *testing.T) {
 
 	for i, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			actual, err := getURLsFromHTML(tc.inputBody, tc.inputURL)
+			baseURL, err := url.Parse(tc.inputURL)
+			if err != nil {
+				t.Errorf("Test %v - '%s' FAIL: couldn't parse input URL: %v", i, tc.name, err)
+				return
+			}
+			actual, err := getURLsFromHTML(tc.inputBody, baseURL)
 			if err != nil {
 				if tc.errContains == "" {
 					t.Errorf("Test %v - %s\n Failed: unexpected error: %v", i, tc.name, err)

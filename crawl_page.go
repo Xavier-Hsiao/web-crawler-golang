@@ -6,6 +6,14 @@ import (
 )
 
 func (cfg *config) crawlPage(rawCurrentURL string) {
+	// Send an empty struct to the buffered channel
+	// when a new goroutine starts
+	cfg.concurrencyControl <- struct{}{}
+	defer func() {
+		// Free up channel
+		<-cfg.concurrencyControl
+		cfg.wg.Done()
+	}()
 	// the current URL we're crawling
 	currentURL, err := url.Parse(rawCurrentURL)
 	if err != nil {
@@ -25,15 +33,10 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		return
 	}
 
-	// Check if the current URL has been visited
-	// If so, increment 1
-	if count, exists := cfg.pages[normalizedCurrent]; exists {
-		cfg.pages[normalizedCurrent] = count + 1
+	isFirst := cfg.addPageVisit(normalizedCurrent)
+	if !isFirst {
 		return
 	}
-
-	// If not, create a new entry
-	cfg.pages[normalizedCurrent] = 1
 
 	fmt.Printf("crawling: %s\n", rawCurrentURL)
 
@@ -45,13 +48,14 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 	}
 
 	// Get all the urls from the html body
-	urls, err := getURLsFromHTML(htmlBody, rawBaseURL)
+	urls, err := getURLsFromHTML(htmlBody, cfg.baseURL)
 	if err != nil {
 		fmt.Printf("Error get urls from html body:\n %v", err)
 		return
 	}
 
 	for _, url := range urls {
-		crawlPage(rawBaseURL, url, pages)
+		cfg.wg.Add(1)
+		go cfg.crawlPage(url)
 	}
 }

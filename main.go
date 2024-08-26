@@ -21,9 +21,9 @@ func main() {
 		return
 	}
 
-	const maxConcurrency = 2
+	const maxConcurrency = 10
 
-	cfg, err := createConfig(args[0], 2)
+	cfg, err := createConfig(args[0], maxConcurrency)
 	if err != nil {
 		fmt.Printf("failed to create config struct:\n %v", err)
 	}
