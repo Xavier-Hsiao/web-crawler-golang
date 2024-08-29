@@ -9,6 +9,7 @@ import (
 func main() {
 	// Get CLI arguments
 	args := os.Args[1:] // os.Args[0] is the program name, skip it
+	baseURL := args[0]
 
 	// Check the number of CLI arguments
 	switch len(args) {
@@ -20,7 +21,7 @@ func main() {
 	case 2:
 		fmt.Printf("no maxPages provided")
 	case 3:
-		fmt.Printf("start crawling on: %v", args[0])
+		fmt.Printf("start crawling on: %v", baseURL)
 	default:
 		fmt.Println("too many arguments provided")
 		return
@@ -36,18 +37,16 @@ func main() {
 		fmt.Println("failed to convert CLI arg to integer")
 	}
 
-	cfg, err := createConfig(args[0], maxConcurrency, maxPages)
+	cfg, err := createConfig(baseURL, maxConcurrency, maxPages)
 	if err != nil {
 		fmt.Printf("failed to create config struct:\n %v", err)
 	}
 
 	cfg.wg.Add(1)
-	go cfg.crawlPage(args[0])
+	go cfg.crawlPage(baseURL)
 	cfg.wg.Wait()
 
-	for url, count := range cfg.pages {
-		fmt.Printf("%v - %v time(s)\n", url, count)
-	}
+	printReport(cfg.pages, baseURL)
 
 	fmt.Println("crawling ends")
 }
