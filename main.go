@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 )
 
 func main() {
@@ -15,15 +16,27 @@ func main() {
 		fmt.Println("no website provided")
 		return
 	case 1:
-		fmt.Printf("start crawling of: %s\n", args[0])
+		fmt.Printf("no maxConcurrency and maxPages provided")
+	case 2:
+		fmt.Printf("no maxPages provided")
+	case 3:
+		fmt.Printf("start crawling on: %v", args[0])
 	default:
 		fmt.Println("too many arguments provided")
 		return
 	}
 
-	const maxConcurrency = 10
+	maxConcurrency, err := strconv.Atoi(args[1])
+	if err != nil {
+		fmt.Println("failed to convert CLI arg to integer")
+	}
 
-	cfg, err := createConfig(args[0], maxConcurrency)
+	maxPages, err := strconv.Atoi(args[2])
+	if err != nil {
+		fmt.Println("failed to convert CLI arg to integer")
+	}
+
+	cfg, err := createConfig(args[0], maxConcurrency, maxPages)
 	if err != nil {
 		fmt.Printf("failed to create config struct:\n %v", err)
 	}

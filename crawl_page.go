@@ -14,6 +14,12 @@ func (cfg *config) crawlPage(rawCurrentURL string) {
 		<-cfg.concurrencyControl
 		cfg.wg.Done()
 	}()
+
+	// Limit max pages
+	if len(cfg.pages) >= cfg.maxPages {
+		return
+	}
+
 	// the current URL we're crawling
 	currentURL, err := url.Parse(rawCurrentURL)
 	if err != nil {

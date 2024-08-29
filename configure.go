@@ -12,9 +12,10 @@ type config struct {
 	mu                 *sync.Mutex
 	wg                 *sync.WaitGroup
 	concurrencyControl chan struct{} // Buffered channel, avoiding spawn too many go routines
+	maxPages           int
 }
 
-func createConfig(rawBaseURL string, maxConcurrency int) (*config, error) {
+func createConfig(rawBaseURL string, maxConcurrency, maxPages int) (*config, error) {
 	baseURL, err := url.Parse(rawBaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse base URL")
@@ -26,6 +27,7 @@ func createConfig(rawBaseURL string, maxConcurrency int) (*config, error) {
 		mu:                 &sync.Mutex{},
 		wg:                 &sync.WaitGroup{},
 		concurrencyControl: make(chan struct{}, maxConcurrency),
+		maxPages:           maxPages,
 	}, nil
 }
 
